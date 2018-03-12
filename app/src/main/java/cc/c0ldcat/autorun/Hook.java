@@ -1,11 +1,12 @@
 package cc.c0ldcat.autorun;
 
+import cc.c0ldcat.autorun.modules.shell.SaveRealDex;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 public class Hook implements IXposedHookLoadPackage {
-    private static Class<?>[] moduleClasses = new Class<?>[] {};
+    private static Class<?>[] moduleClasses = new Class<?>[] {SaveRealDex.class};
 
     @Override
     public void handleLoadPackage(XC_LoadPackage.LoadPackageParam loadPackageParam) throws Throwable {
