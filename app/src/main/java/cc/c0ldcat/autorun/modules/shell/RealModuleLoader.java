@@ -37,6 +37,7 @@ public class RealModuleLoader extends Module {
                     realClassLoader = (ClassLoader) param.thisObject;
                     LogUtils.i("get real ClassLoader: " + classLoader.hashCode());
 
+                    new GetCheckPoint(realClassLoader).load();
                 }
             }
         });
