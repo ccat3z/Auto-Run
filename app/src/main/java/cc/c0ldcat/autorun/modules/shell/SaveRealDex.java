@@ -1,13 +1,12 @@
 package cc.c0ldcat.autorun.modules.shell;
 
 import android.os.Environment;
+import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.RefectHelper;
-import de.robv.android.xposed.IXposedHookLoadPackage;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
-import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,14 +15,19 @@ import java.util.Set;
 
 // 方法出自: https://bbs.pediy.com/thread-224105.htm
 
-public class SaveRealDex implements IXposedHookLoadPackage {
+public class SaveRealDex implements Module {
     private Set<Object> realDexs = new HashSet<>();
+    private ClassLoader classLoader;
 
     private static final String DEX_SAVE_DIR = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getPath();
 
+    public SaveRealDex(ClassLoader classLoader) {
+        this.classLoader = classLoader;
+    }
+
     @Override
-    public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam loadPackageParam) {
-        XposedHelpers.findAndHookMethod("java.lang.ClassLoader", loadPackageParam.classLoader, "loadClass", String.class, boolean.class, new XC_MethodHook() {
+    public void load() {
+        XposedHelpers.findAndHookMethod("java.lang.ClassLoader", classLoader, "loadClass", String.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Class<?> cls = (Class<?>) param.getResult();
