@@ -7,7 +7,7 @@ import cc.c0ldcat.autorun.utils.RefectHelper;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
-public class RealModuleLoader implements Module {
+public class RealModuleLoader extends Module {
     private ClassLoader classLoader;
 
     public RealModuleLoader(ClassLoader classLoader) {
@@ -16,6 +16,7 @@ public class RealModuleLoader implements Module {
 
     @Override
     public void load() {
+        super.load();
         XposedHelpers.findAndHookMethod("java.lang.ClassLoader", classLoader, "loadClass", String.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(XC_MethodHook.MethodHookParam param) throws Throwable {

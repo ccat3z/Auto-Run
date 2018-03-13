@@ -12,8 +12,8 @@ public class Hook implements IXposedHookLoadPackage {
         if (loadPackageParam.packageName.equals("com.example.gita.gxty")) {
             LogUtils.i("in 高校体育 app");
 
-            new SaveRealDex(loadPackageParam.classLoader).load();
-            new RealModuleLoader(loadPackageParam.classLoader).load();
+            if (BuildConfig.SAVE_REAL_DEX) new SaveRealDex(loadPackageParam.classLoader).load();
+            if (BuildConfig.REAL_MODULE_LOADER) new RealModuleLoader(loadPackageParam.classLoader).load();
         }
     }
 }

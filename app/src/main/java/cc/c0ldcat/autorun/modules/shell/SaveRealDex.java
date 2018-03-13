@@ -15,7 +15,7 @@ import java.util.Set;
 
 // 方法出自: https://bbs.pediy.com/thread-224105.htm
 
-public class SaveRealDex implements Module {
+public class SaveRealDex extends Module {
     private Set<Object> realDexs = new HashSet<>();
     private ClassLoader classLoader;
 
@@ -27,6 +27,7 @@ public class SaveRealDex implements Module {
 
     @Override
     public void load() {
+        super.load();
         XposedHelpers.findAndHookMethod("java.lang.ClassLoader", classLoader, "loadClass", String.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

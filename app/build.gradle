@@ -11,9 +11,16 @@ android {
         versionName "1.0"
 
         buildConfigField("int", "REAL_DEX_LENGTH", "8998304")
+        buildConfigField("boolean", "SAVE_REAL_DEX", "false")
+        buildConfigField("boolean", "REAL_MODULE_LOADER", "false")
     }
     buildTypes {
+        unpack {
+            buildConfigField("boolean", "SAVE_REAL_DEX", "true")
+        }
         release {
+            buildConfigField("boolean", "REAL_MODULE_LOADER", "true")
+
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
