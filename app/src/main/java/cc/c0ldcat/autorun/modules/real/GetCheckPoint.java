@@ -1,10 +1,8 @@
 package cc.c0ldcat.autorun.modules.real;
 
-import android.os.Bundle;
-import android.util.Log;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.LogUtils;
-import cc.c0ldcat.autorun.utils.RefectHelper;
+import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
@@ -28,13 +26,13 @@ public class GetCheckPoint extends Module {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Object markerOption = param.args[0];
-                String title = (String) RefectHelper.getPrivateMethod(aMapMarkerOptionClass, "getTitle").invoke(markerOption);
+                String title = (String) ReflectHelper.getPrivateMethod(aMapMarkerOptionClass, "getTitle").invoke(markerOption);
 
                 if (title.equals("必经点") || title.equals("途经点")) {
-                    Object latLng = RefectHelper.getPrivateMethod(aMapMarkerOptionClass, "getPosition").invoke(markerOption);
+                    Object latLng = ReflectHelper.getPrivateMethod(aMapMarkerOptionClass, "getPosition").invoke(markerOption);
 
-                    double latitude = (double) RefectHelper.getPrivateObject(aMapLatLngClass, "latitude", latLng);
-                    double longitude = (double) RefectHelper.getPrivateObject(aMapLatLngClass, "longitude", latLng);
+                    double latitude = (double) ReflectHelper.getPrivateObject(aMapLatLngClass, "latitude", latLng);
+                    double longitude = (double) ReflectHelper.getPrivateObject(aMapLatLngClass, "longitude", latLng);
 
                     LogUtils.i(title + ":" + latitude + ":" + longitude);
                 }

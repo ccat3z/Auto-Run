@@ -4,7 +4,7 @@ import android.os.Environment;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
-import cc.c0ldcat.autorun.utils.RefectHelper;
+import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
@@ -32,8 +32,8 @@ public class SaveRealDex extends Module {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 Class<?> cls = (Class<?>) param.getResult();
-                Object dex = RefectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
-                byte[] dexBytes = (byte[]) RefectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
+                Object dex = ReflectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
+                byte[] dexBytes = (byte[]) ReflectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
 
                 StringBuilder logSB = new StringBuilder();
                 logSB.append("load class: ").append(cls.getName()).append(" from dex: ").append(dex.hashCode())

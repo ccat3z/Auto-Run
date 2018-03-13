@@ -3,7 +3,7 @@ package cc.c0ldcat.autorun.utils;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class RefectHelper {
+public class ReflectHelper {
     public static Field getPrivateField(Class<?> cls, String fieldName) throws NoSuchFieldException {
         Field field = cls.getDeclaredField(fieldName);
         field.setAccessible(true);

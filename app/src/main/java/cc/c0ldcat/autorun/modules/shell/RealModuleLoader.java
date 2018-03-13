@@ -4,7 +4,7 @@ import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.modules.real.GetCheckPoint;
 import cc.c0ldcat.autorun.utils.LogUtils;
-import cc.c0ldcat.autorun.utils.RefectHelper;
+import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
@@ -29,8 +29,8 @@ public class RealModuleLoader extends Module {
                 if (cls == null)
                     return;
 
-                Object dex = RefectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
-                byte[] dexBytes = (byte[]) RefectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
+                Object dex = ReflectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
+                byte[] dexBytes = (byte[]) ReflectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
 
 
                 if (dexBytes.length == BuildConfig.REAL_DEX_LENGTH) {
