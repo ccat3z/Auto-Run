@@ -9,6 +9,8 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+
+        buildConfigField("int", "REAL_DEX_LENGTH", "8998304")
     }
     buildTypes {
         release {

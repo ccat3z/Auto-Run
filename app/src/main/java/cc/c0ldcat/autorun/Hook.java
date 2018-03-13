@@ -1,5 +1,6 @@
 package cc.c0ldcat.autorun;
 
+import cc.c0ldcat.autorun.modules.shell.RealModuleLoader;
 import cc.c0ldcat.autorun.modules.shell.SaveRealDex;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import de.robv.android.xposed.IXposedHookLoadPackage;
@@ -12,6 +13,7 @@ public class Hook implements IXposedHookLoadPackage {
             LogUtils.i("in 高校体育 app");
 
             new SaveRealDex(loadPackageParam.classLoader).load();
+            new RealModuleLoader(loadPackageParam.classLoader).load();
         }
     }
 }
