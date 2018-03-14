@@ -3,13 +3,14 @@ package cc.c0ldcat.autorun.wrappers;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.ReflectHelper;
+import de.robv.android.xposed.XposedHelpers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReflectWrapper {
+public abstract class ReflectWrapper {
     private Object object;
 
     public ReflectWrapper(Object object) {
@@ -59,8 +60,13 @@ public class ReflectWrapper {
         return object.getClass();
     }
 
+    public Class<?> getObjectClass(ClassLoader classLoader) {
+        return XposedHelpers.findClassIfExists(getTargetClassName(), classLoader);
+    }
+
     public Object getObject() {
         return object;
     }
 
+    public abstract String getTargetClassName();
 }

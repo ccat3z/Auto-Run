@@ -14,4 +14,9 @@ public class LatLngWrapper extends ReflectWrapper {
     public double getLongitude() {
         return (double) getAttributeIfExist("longitude");
     }
+
+    @Override
+    public String getTargetClassName() {
+        return "com.amap.api.maps.model.LatLng";
+    }
 }
