@@ -17,18 +17,15 @@ public class GetCheckPoint extends Module {
     private ClassLoader classLoader;
     private Map<Object, List<LatLngWrapper>> latLngs = new HashMap<>();
 
-    private Class<?> aMapMarkerOptionClass;
-
     public GetCheckPoint(ClassLoader classLoader) {
         this.classLoader = classLoader;
-
-        aMapMarkerOptionClass = XposedHelpers.findClassIfExists("com.amap.api.maps.model.MarkerOptions", classLoader);
     }
 
     @Override
     public void load() {
         super.load();
-        XposedHelpers.findAndHookMethod("com.amap.api.maps.AMap", classLoader, "addMarker", aMapMarkerOptionClass, new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod("com.amap.api.maps.AMap", classLoader,
+                "addMarker", XposedHelpers.findClassIfExists(MarkerOptionsWrapper.CLASS, classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 MarkerOptionsWrapper markerOption = new MarkerOptionsWrapper(param.args[0]);
