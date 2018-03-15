@@ -14,9 +14,4 @@ public class MarkerOptionsWrapper extends ReflectWrapper {
     public LatLngWrapper getPosition() {
         return new LatLngWrapper(invokeMethodIfAccessable("getPosition"));
     }
-
-    @Override
-    public String getTargetClassName() {
-        return "com.amap.api.maps.model.MarkerOptions";
-    }
 }
