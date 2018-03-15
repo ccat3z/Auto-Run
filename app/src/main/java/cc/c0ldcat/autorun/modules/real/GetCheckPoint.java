@@ -2,6 +2,7 @@ package cc.c0ldcat.autorun.modules.real;
 
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.LogUtils;
+import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.AMapWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.MarkerOptionsWrapper;
 import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.MyRuningActivityWrapper;
@@ -24,8 +25,8 @@ public class GetCheckPoint extends Module {
     @Override
     public void load() {
         super.load();
-        XposedHelpers.findAndHookMethod("com.amap.api.maps.AMap", classLoader,
-                "addMarker", XposedHelpers.findClassIfExists(MarkerOptionsWrapper.CLASS, classLoader), new XC_MethodHook() {
+        XposedHelpers.findAndHookMethod(AMapWrapper.CLASS, classLoader,
+                AMapWrapper.METHOD_ADD_MARKER, XposedHelpers.findClassIfExists(MarkerOptionsWrapper.CLASS, classLoader), new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {
                 MarkerOptionsWrapper markerOption = new MarkerOptionsWrapper(param.args[0]);
