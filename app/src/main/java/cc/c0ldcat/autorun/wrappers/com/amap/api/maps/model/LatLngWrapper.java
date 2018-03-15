@@ -14,6 +14,7 @@ public class LatLngWrapper extends ReflectWrapper {
     public double getLongitude() {
         return (double) getAttributeIfExist("longitude");
     }
+
     @Override
     public String toString() {
         return new StringBuilder().append("(").append(getLatitude()).append(", ").append(getLongitude()).append(")").toString();
