@@ -3,6 +3,7 @@ package cc.c0ldcat.autorun.modules.shell;
 import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.modules.real.GetCheckPoint;
+import cc.c0ldcat.autorun.modules.real.Test;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;

@@ -3,16 +3,19 @@ package cc.c0ldcat.autorun.wrappers;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.ReflectHelper;
+import de.robv.android.xposed.XposedHelpers;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReflectWrapper {
+public abstract class ReflectWrapper {
     private Object object;
 
-    public ReflectWrapper(Object object) {
+    abstract public String getClassName();
+
+    public void setObject(Object object) {
         this.object = object;
     }
 
@@ -57,6 +60,21 @@ public class ReflectWrapper {
 
     public Class<?> getObjectClass() {
         return object.getClass();
+    }
+
+    public Class<?> getObjectClass(ClassLoader classLoader) {
+        return XposedHelpers.findClassIfExists(getClassName(), classLoader);
+    }
+
+    public void hookMethod(ClassLoader classLoader, String methodName, Object ...parameterTypesAndCallback) {
+        XposedHelpers.findAndHookMethod(getObjectClass(classLoader), methodName, parameterTypesAndCallback);
+    }
+
+    public void hookMethod(ClassLoader classLoader, String methodName, List<Class> parameterTypes, Object callback) {
+        ArrayList<Object> parameterTypesAndCallback = new ArrayList<Object>(parameterTypes);
+        parameterTypesAndCallback.add(callback);
+
+        XposedHelpers.findAndHookMethod(getObjectClass(classLoader), methodName, parameterTypesAndCallback.toArray());
     }
 
     public Object getObject() {

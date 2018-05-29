@@ -3,9 +3,9 @@ package cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model;
 import cc.c0ldcat.autorun.wrappers.ReflectWrapper;
 
 public class MarkerOptionsWrapper extends ReflectWrapper {
-    public static String CLASS = "com.amap.api.maps.model.MarkerOptions";
-    public MarkerOptionsWrapper(Object object) {
-        super(object);
+    @Override
+    public String getClassName() {
+        return  "com.amap.api.maps.model.MarkerOptions";
     }
 
     public String getTitle() {
@@ -13,6 +13,8 @@ public class MarkerOptionsWrapper extends ReflectWrapper {
     }
 
     public LatLngWrapper getPosition() {
-        return new LatLngWrapper(invokeMethodIfAccessable("getPosition"));
+        LatLngWrapper latLngWrapper = new LatLngWrapper();
+        latLngWrapper.setObject(invokeMethodIfAccessable("getPosition"));
+        return latLngWrapper;
     }
 }
