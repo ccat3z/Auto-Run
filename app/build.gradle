@@ -25,9 +25,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    buildTypes.each{
+        it.buildConfigField 'String', 'AMAP_WEB_KEY', AutoRunAMapWebKey
+    }
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     provided 'de.robv.android.xposed:api:82'
+    compile 'com.android.volley:volley:1.1.0'
 }

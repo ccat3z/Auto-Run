@@ -2,8 +2,9 @@ package cc.c0ldcat.autorun.modules.shell;
 
 import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.modules.Module;
+import cc.c0ldcat.autorun.modules.real.FakeWalk;
 import cc.c0ldcat.autorun.modules.real.GetCheckPoint;
-import cc.c0ldcat.autorun.modules.real.Test;
+import cc.c0ldcat.autorun.modules.real.GetMyRuningActivity;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
@@ -38,7 +39,13 @@ public class RealModuleLoader extends Module {
                     realClassLoader = (ClassLoader) param.thisObject;
                     LogUtils.i("get real ClassLoader: " + classLoader.hashCode());
 
-                    new GetCheckPoint(realClassLoader).load();
+                    GetCheckPoint getCheckPoint = new GetCheckPoint(realClassLoader);
+                    getCheckPoint.load();
+
+                    GetMyRuningActivity getMyRuningActivity = new GetMyRuningActivity(realClassLoader);
+                    getMyRuningActivity.load();
+
+                    new FakeWalk(realClassLoader, getCheckPoint, getMyRuningActivity).load();
                 }
             }
         });

@@ -1,25 +1,41 @@
 package cc.c0ldcat.autorun.modules.real;
 
+import cc.c0ldcat.autorun.models.Location;
+import cc.c0ldcat.autorun.models.SimpleLocation;
 import cc.c0ldcat.autorun.modules.Module;
+import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.AMapWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.MarkerOptionsWrapper;
 import de.robv.android.xposed.XC_MethodHook;
-import de.robv.android.xposed.XposedHelpers;
 
-import java.io.CharArrayReader;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GetCheckPoint extends Module {
     private ClassLoader classLoader;
-    private Map<Object, List<LatLngWrapper>> latLngs = new HashMap<>();
+    private Object amap;
+    private List<Location> latLngs = new ArrayList<>();
 
     public GetCheckPoint(ClassLoader classLoader) {
         this.classLoader = classLoader;
+    }
+
+    public Object getAMap() {
+        return amap;
+    }
+
+    public Location getNextCheckPoint(Location location) throws NoSuchElementException {
+        Location min = null;
+        for (Location latLng : latLngs) {
+            if (min == null || CommonUtils.distance(location, latLng) < CommonUtils.distance(location, min)) {
+                min = latLng;
+            }
+        }
+
+        if (min != null) latLngs.remove(min);
+
+        return min;
     }
 
     @Override
@@ -34,17 +50,23 @@ public class GetCheckPoint extends Module {
 
                 String title = markerOption.getTitle();
 
-                Object amap = param.thisObject;
+                // if change map
+                if(amap != param.thisObject) {
+                    LogUtils.i("new run plan");
+                    latLngs.clear();
+                    amap = param.thisObject;
+                }
 
                 if (title == null || title.equals("必经点") || title.equals("途经点")) {
-                    if (! latLngs.containsKey(amap))
-                        latLngs.put(amap, new ArrayList<LatLngWrapper>());
                     LatLngWrapper latLng = markerOption.getPosition();
-                    latLngs.get(amap).add(latLng);
 
-                    if (title == null) title = "起点";
+                    if (title == null) {
+                        title = "起点";
+                    } else {
+                        latLngs.add(latLng);
+                    }
 
-                    LogUtils.i(title + ":" + latLng.getLatitude() + ":" + latLng.getLongitude());
+                    LogUtils.i(title + ": " + latLng);
                 }
             }
         });

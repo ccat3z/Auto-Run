@@ -35,6 +35,10 @@ public abstract class ReflectWrapper {
         return ReflectHelper.getPrivateMethod(getObjectClass(), methodName, params);
     }
 
+    public Method getMethod(ClassLoader classLoader, String methodName, Class<?> ...params) throws NoSuchMethodException {
+        return ReflectHelper.getPrivateMethod(getObjectClass(classLoader), methodName, params);
+    }
+
     public Object invokeMethodIfAccessable(String methodName, Object ...params) {
         try {
             return invokeMethod(methodName, params);
@@ -42,6 +46,19 @@ public abstract class ReflectWrapper {
             LogUtils.e(CommonUtils.exceptionStacktraceToString(e));
             return null;
         }
+    }
+
+    public Object invokeMethodIfAccessable(String methodName, Class[] types, Object[] params) {
+        try {
+            return invokeMethod(methodName, types, params);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            LogUtils.e(CommonUtils.exceptionStacktraceToString(e));
+            return null;
+        }
+    }
+
+    public Object invokeMethod(String methodName, Class[] types, Object[] params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        return getMethod(methodName, types).invoke(object, params);
     }
 
     public Object invokeMethod(String methodName, Object ...params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
