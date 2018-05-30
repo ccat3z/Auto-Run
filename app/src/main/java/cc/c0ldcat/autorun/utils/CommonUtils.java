@@ -1,6 +1,7 @@
 package cc.c0ldcat.autorun.utils;
 
 import cc.c0ldcat.autorun.models.Location;
+import cc.c0ldcat.autorun.models.SimpleVector;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.location.AMapLocationWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
 
@@ -38,5 +39,10 @@ public class CommonUtils {
 
     public static double distance(Location from, Location to) {
         return distance(from.getLongitude(), from.getLatitude(), to.getLongitude(), to.getLatitude());
+    }
+
+    public static SimpleVector vector(Location from, Location to, double length) {
+        double time = length / distance(from, to);
+        return new SimpleVector(time * (to.getLongitude() - from.getLongitude()), time * (to.getLatitude() - from.getLatitude()));
     }
 }

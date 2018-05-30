@@ -62,6 +62,7 @@ public class GetCheckPoint extends Module {
 
                     if (title == null) {
                         title = "起点";
+                        latLngs.add(new SimpleLocation(latLng.getLongitude() + 0.01, latLng.getLatitude() + 0.01));
                     } else {
                         latLngs.add(latLng);
                     }

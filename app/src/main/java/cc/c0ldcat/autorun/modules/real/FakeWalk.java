@@ -1,15 +1,15 @@
 package cc.c0ldcat.autorun.modules.real;
 
 import android.content.Context;
-import android.util.Log;
 import cc.c0ldcat.autorun.BuildConfig;
+import cc.c0ldcat.autorun.Common;
 import cc.c0ldcat.autorun.models.Location;
 import cc.c0ldcat.autorun.models.SimpleLocation;
+import cc.c0ldcat.autorun.models.SimpleVector;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.location.AMapLocationWrapper;
-import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
 import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.service.BaseService.AMapLocationListenerWrapper;
 import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.service.RuningServiceWrapper;
 import com.android.volley.Request;
@@ -17,7 +17,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
@@ -27,8 +26,6 @@ import org.json.JSONObject;
 
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.NoSuchElementException;
-import java.util.Queue;
 
 // TODO: blindly walk if distance is not enough
 
@@ -42,12 +39,11 @@ public class FakeWalk extends Module {
     private double latitude = 0;
     private double longitude = 0;
 
-    private double latitudeStep = 0;
-    private double longitudeStep = 0;
-    private boolean stop = true;
+    private boolean waitingRelayPoints = true;
     private Deque<Location> goTos = new LinkedList<>();
 
     private int step = 0;
+    private double speed = 0.0001;
 
     public FakeWalk(ClassLoader classLoader, GetCheckPoint getCheckPoint, GetMyRuningActivity getMyRuningActivity) {
         this.classLoader = classLoader;
@@ -88,12 +84,12 @@ public class FakeWalk extends Module {
 
                 // get next target
                 if (goTo() == null) {
-                    stop = true;
                     goTos.addLast(getCheckPoint.getNextCheckPoint(new SimpleLocation(longitude, latitude)));
 
                     if (goTo() == null) {
                         LogUtils.i("no more target");
                     } else {
+                        waitingRelayPoints = true;
                         addRelayPoints();
 
                         LogUtils.i("new target " + goTo());
@@ -101,35 +97,23 @@ public class FakeWalk extends Module {
                 }
 
                 // move to target
-                if (! stop) {
-                    latitude += latitudeStep;
-                    longitude += longitudeStep;
+                if (!waitingRelayPoints && goTo() != null) {
+                    SimpleVector stepVector = CommonUtils.vector(new SimpleLocation(longitude, latitude), goTo(), speed);
+                    latitude += stepVector.getLatitude();
+                    longitude += stepVector.getLongitude();
 
-                    aMapLocation.setLatitude(latitude);
-                    aMapLocation.setLongitude(longitude);
-
-                    LogUtils.i("move to " + aMapLocation);
-
-                    if (Math.abs(Math.abs(latitude - goTo().getLatitude()) - Math.abs(latitudeStep)) < 0.000001) {
-                        LogUtils.i("reach target latitude");
-                        latitudeStep = 0;
-                    }
-
-                    if (Math.abs(Math.abs(longitude - goTo().getLongitude()) - Math.abs(longitudeStep)) < 0.000001) {
-                        LogUtils.i("reach target longitude");
-                        longitudeStep = 0;
-                    }
-
-                    if (latitudeStep == 0 && longitudeStep == 0) {
+                    if (Math.abs(latitude - goTo().getLatitude()) < speed
+                            && Math.abs(longitude - goTo().getLongitude()) < speed) {
                         LogUtils.i("reach target");
                         goTos.pollFirst();
-
-                        if (goTo() != null) {
-                            latitudeStep = (goTo().getLatitude() - latitude) / 3;
-                            longitudeStep = (goTo().getLongitude() - longitude) / 3;
-                        }
                     }
                 }
+
+                // do move
+                aMapLocation.setLatitude(latitude);
+                aMapLocation.setLongitude(longitude);
+
+                LogUtils.i("move to " + aMapLocation);
             }
         });
 
@@ -163,9 +147,7 @@ public class FakeWalk extends Module {
                         }
                     }
 
-                    stop = false;
-                    latitudeStep = (goTo().getLatitude() - latitude) / 3;
-                    longitudeStep = (goTo().getLongitude() - longitude) / 3;
+                    waitingRelayPoints = false;
                 } catch (JSONException e) {
                     LogUtils.e(e);
                     LogUtils.e(jsonObject.toString());
