@@ -31,6 +31,7 @@ public class GetMyRuningActivity extends Module {
                 super.beforeHookedMethod(param);
                 myRuningActivity = (Activity) param.thisObject;
                 LogUtils.d("get activity");
+                LogUtils.setContext(myRuningActivity);
             }
         });
     }
