@@ -1,12 +1,9 @@
 package cc.c0ldcat.autorun.utils;
 
-import android.content.Context;
 import de.robv.android.xposed.XposedHelpers;
 
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.NoSuchElementException;
 
 public class ReflectHelper {
     public static Field getPrivateField(Class<?> cls, String fieldName) throws NoSuchFieldError {

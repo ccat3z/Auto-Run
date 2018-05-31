@@ -58,17 +58,11 @@ public abstract class ReflectWrapper {
     }
 
     public Object invokeMethod(String methodName, Class[] types, Object[] params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        return getMethod(methodName, types).invoke(object, params);
+        return invokeMethod(getMethod(methodName, types), params);
     }
 
     public Object invokeMethod(String methodName, Object ...params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        List<Class<?>> paramsClassList = new ArrayList<>();
-
-        for (Object param : params) {
-            paramsClassList.add(param.getClass());
-        }
-
-        return invokeMethod(getMethod(methodName, paramsClassList.toArray(new Class[paramsClassList.size()])));
+        return invokeMethod(getMethod(methodName, guessTypesClass(params)), params);
     }
 
     public Object invokeMethod(Method method, Object ...params) throws IllegalAccessException, InvocationTargetException {
@@ -96,6 +90,16 @@ public abstract class ReflectWrapper {
 
     public Object getObject() {
         return object;
+    }
+
+    private Class[] guessTypesClass(Object ...params) {
+        List<Class<?>> paramsClassList = new ArrayList<>();
+
+        for (Object param : params) {
+            paramsClassList.add(param.getClass());
+        }
+
+        return paramsClassList.toArray(new Class[paramsClassList.size()]);
     }
 
 }

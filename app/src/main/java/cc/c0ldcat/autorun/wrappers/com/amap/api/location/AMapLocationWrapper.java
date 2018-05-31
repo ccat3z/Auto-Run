@@ -18,11 +18,11 @@ public class AMapLocationWrapper extends ReflectWrapper implements Location {
     }
 
     public void setLatitude(double latitude) {
-        invokeMethodIfAccessable("setLatitude", new Class[] {double.class}, new Object[] {latitude});
+        invokeMethodIfAccessable("setLatitude", latitude);
     }
 
     public void setLongitude(double longitude) {
-        invokeMethodIfAccessable("setLongitude", new Class[] {double.class}, new Object[] {longitude});
+        invokeMethodIfAccessable("setLongitude", longitude);
     }
 
     @Override
