@@ -10,7 +10,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class ReflectWrapper {
+public abstract class ReflectWrapper<T extends ReflectWrapper> {
     private Object object;
 
     abstract public String getClassName();
@@ -102,4 +102,8 @@ public abstract class ReflectWrapper {
         return paramsClassList.toArray(new Class[paramsClassList.size()]);
     }
 
+    protected T newInstance(ClassLoader classLoader, Object ...params) {
+        setObject(XposedHelpers.newInstance(getObjectClass(classLoader), params));
+        return (T) this;
+    }
 }

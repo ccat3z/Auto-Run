@@ -5,7 +5,7 @@ import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.MarkerOptionsWrapper;
 
 import java.util.ArrayList;
 
-public class AMapWrapper extends ReflectWrapper {
+public class AMapWrapper extends ReflectWrapper<AMapWrapper> {
     @Override
     public String getClassName() {
         return "com.amap.api.maps.AMap";

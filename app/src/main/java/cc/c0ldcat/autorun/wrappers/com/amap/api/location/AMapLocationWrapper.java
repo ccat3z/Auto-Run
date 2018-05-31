@@ -3,7 +3,7 @@ package cc.c0ldcat.autorun.wrappers.com.amap.api.location;
 import cc.c0ldcat.autorun.models.Location;
 import cc.c0ldcat.autorun.wrappers.ReflectWrapper;
 
-public class AMapLocationWrapper extends ReflectWrapper implements Location {
+public class AMapLocationWrapper extends ReflectWrapper<AMapLocationWrapper> implements Location {
     @Override
     public String getClassName() {
         return "com.amap.api.location.AMapLocation";

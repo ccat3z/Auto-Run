@@ -5,7 +5,7 @@ import cc.c0ldcat.autorun.wrappers.com.amap.api.location.AMapLocationWrapper;
 
 import java.util.ArrayList;
 
-public class AMapLocationListenerWrapper extends ReflectWrapper {
+public class AMapLocationListenerWrapper extends ReflectWrapper<AMapLocationListenerWrapper> {
     @Override
     public String getClassName() {
         return "com.example.gita.gxty.ram.service.BaseService$2";
