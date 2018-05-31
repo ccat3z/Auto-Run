@@ -1,5 +1,6 @@
 package cc.c0ldcat.autorun.modules.shell;
 
+import android.os.Build;
 import android.os.Environment;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
@@ -28,6 +29,11 @@ public class SaveRealDex extends Module {
     @Override
     public void load() {
         super.load();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            LogUtils.e("Not support O");
+            return;
+        }
+
         XposedHelpers.findAndHookMethod("java.lang.ClassLoader", classLoader, "loadClass", String.class, boolean.class, new XC_MethodHook() {
             @Override
             protected void afterHookedMethod(MethodHookParam param) throws Throwable {

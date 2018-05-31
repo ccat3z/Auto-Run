@@ -1,5 +1,6 @@
 package cc.c0ldcat.autorun.modules.shell;
 
+import android.os.Build;
 import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.modules.real.FakeWalk;
@@ -31,11 +32,16 @@ public class RealModuleLoader extends Module {
                 if (cls == null)
                     return;
 
-                Object dex = ReflectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
-                byte[] dexBytes = (byte[]) ReflectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
+                boolean isTargetDex = false;
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+                    Object dex = ReflectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
+                    byte[] dexBytes = (byte[]) ReflectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
+                    isTargetDex = dexBytes.length == BuildConfig.REAL_DEX_LENGTH;
+                } else {
+                    isTargetDex = XposedHelpers.findClassIfExists(BuildConfig.CLASS_IN_REAL_MODULE_LOADER, (ClassLoader) param.thisObject) != null;
+                }
 
-
-                if (dexBytes.length == BuildConfig.REAL_DEX_LENGTH) {
+                if (isTargetDex) {
                     realClassLoader = (ClassLoader) param.thisObject;
                     LogUtils.i("get real ClassLoader: " + classLoader.hashCode());
 
