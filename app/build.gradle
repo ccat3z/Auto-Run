@@ -14,6 +14,7 @@ android {
         buildConfigField("boolean", "SAVE_REAL_DEX", "false")
         buildConfigField("boolean", "REAL_MODULE_LOADER", "false")
         buildConfigField("String", "CLASS_IN_REAL_MODULE_LOADER", "\"com.example.gita.gxty.ram.MyRuningActivity\"")
+        buildConfigField("String", "AMAP_WEB_KEY", AutoRunAMapWebKey)
     }
     buildTypes {
         unpack {
@@ -25,10 +26,6 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-
-    buildTypes.each{
-        it.buildConfigField 'String', 'AMAP_WEB_KEY', AutoRunAMapWebKey
     }
 }
 
