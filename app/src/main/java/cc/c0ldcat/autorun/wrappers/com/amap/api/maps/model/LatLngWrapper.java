@@ -17,6 +17,10 @@ public class LatLngWrapper extends ReflectWrapper<LatLngWrapper> implements Loca
         return (double) getAttributeIfExist("longitude");
     }
 
+    public LatLngWrapper newInstance(ClassLoader classLoader, double longitude, double latitude) {
+        return super.newInstance(classLoader, latitude, longitude);
+    }
+
     @Override
     public String toString() {
         return getLongitude() + "," + getLatitude();

@@ -14,15 +14,20 @@ import java.util.*;
 
 public class GetCheckPoint extends Module {
     private ClassLoader classLoader;
-    private Object amap;
+    private AMapWrapper aMapWrapper = new AMapWrapper();
     private List<Location> latLngs = new ArrayList<>();
+    private boolean haveEnd = false;
 
     public GetCheckPoint(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
     public Object getAMap() {
-        return amap;
+        return aMapWrapper.getObject();
+    }
+
+    public AMapWrapper getaMapWrapper() {
+        return aMapWrapper;
     }
 
     public Location getNextCheckPoint(Location location) throws NoSuchElementException {
@@ -51,18 +56,23 @@ public class GetCheckPoint extends Module {
                 String title = markerOption.getTitle();
 
                 // if change map
-                if(amap != param.thisObject) {
+                if(aMapWrapper.getObject() != param.thisObject) {
                     LogUtils.i("new run plan");
                     latLngs.clear();
-                    amap = param.thisObject;
+                    aMapWrapper.setObject(param.thisObject);
                 }
 
                 if (title == null || title.equals("必经点") || title.equals("途经点")) {
                     LatLngWrapper latLng = markerOption.getPosition();
 
-                    if (title == null) {
+                    if (title == null && ! haveEnd) {
+                        haveEnd = true;
                         title = "起点";
-                        latLngs.add(new SimpleLocation(latLng.getLongitude() + 0.01, latLng.getLatitude() + 0.01));
+                        Location end = new SimpleLocation(latLng.getLongitude() + 0.01, latLng.getLatitude() + 0.01);
+                        aMapWrapper.addMarker(end);
+                        latLngs.add(end);
+
+                        LogUtils.i( "END: " + end);
                     } else {
                         latLngs.add(latLng);
                     }
