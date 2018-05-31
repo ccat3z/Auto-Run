@@ -89,6 +89,7 @@ public class FakeWalk extends Module {
                     if (goTo() == null) {
                         LogUtils.i("no more target");
                     } else {
+                        LogUtils.it("waiting relay points...");
                         waitingRelayPoints = true;
                         addRelayPoints();
 
@@ -104,8 +105,9 @@ public class FakeWalk extends Module {
 
                     if (Math.abs(latitude - goTo().getLatitude()) < speed
                             && Math.abs(longitude - goTo().getLongitude()) < speed) {
-                        LogUtils.i("reach target");
+                        LogUtils.it("reach target " + goTo());
                         goTos.pollFirst();
+                        LogUtils.it("goto target " + goTo());
                     }
                 }
 
@@ -147,6 +149,8 @@ public class FakeWalk extends Module {
                         }
                     }
 
+                    LogUtils.it("get relay points");
+                    LogUtils.it("goto target " + goTo());
                     waitingRelayPoints = false;
                 } catch (JSONException e) {
                     LogUtils.e(e);
