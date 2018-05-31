@@ -48,7 +48,7 @@ public abstract class ReflectWrapper<T extends ReflectWrapper> {
         }
     }
 
-    public Object invokeMethodIfAccessable(String methodName, Class[] types, Object[] params) {
+    public Object invokeMethodIfAccessable(String methodName, Class[] types, Object ...params) {
         try {
             return invokeMethod(methodName, types, params);
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -57,7 +57,7 @@ public abstract class ReflectWrapper<T extends ReflectWrapper> {
         }
     }
 
-    public Object invokeMethod(String methodName, Class[] types, Object[] params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public Object invokeMethod(String methodName, Class[] types, Object ...params) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         return invokeMethod(getMethod(methodName, types), params);
     }
 
