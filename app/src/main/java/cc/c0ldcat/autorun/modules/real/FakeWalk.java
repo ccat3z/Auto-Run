@@ -84,11 +84,12 @@ public class FakeWalk extends Module {
 
                 // get next target
                 if (goTo() == null) {
-                    goTos.addLast(getCheckPoint.getNextCheckPoint(new SimpleLocation(longitude, latitude)));
+                    Location next = getCheckPoint.getNextCheckPoint(new SimpleLocation(longitude, latitude));
 
-                    if (goTo() == null) {
+                    if (next == null) {
                         LogUtils.i("no more target");
                     } else {
+                        goTos.addLast(next);
                         LogUtils.it("waiting relay points...");
                         waitingRelayPoints = true;
                         addRelayPoints();
