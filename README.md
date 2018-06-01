@@ -7,4 +7,6 @@
 
 ## 1.0
 
+* [x] 模拟检查点
+* [x] 添加自定义检查点
 * [ ] AMap web api key setting activity
