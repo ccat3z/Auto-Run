@@ -9,7 +9,6 @@
 
 * [x] 模拟检查点
 * [x] 添加自定义检查点
-* [ ] AMap web api key setting activity
 * [x] 支持高校体育2.0.8
 
 ## 1.0.1
