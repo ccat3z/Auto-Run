@@ -41,6 +41,7 @@ public class CommonUtils {
         return distance(from.getLongitude(), from.getLatitude(), to.getLongitude(), to.getLatitude());
     }
 
+    // TODO: don't exceed to location
     public static SimpleVector vector(Location from, Location to, double length) {
         double time = length / distance(from, to);
         return new SimpleVector(time * (to.getLongitude() - from.getLongitude()), time * (to.getLatitude() - from.getLatitude()));
