@@ -20,6 +20,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XC_MethodReplacement;
+import org.apache.commons.lang3.RandomUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,6 +45,8 @@ public class FakeWalk extends Module {
 
     private int step = 0;
     private double speed = 0.0001;
+    private double speedMax = 0.00015;
+    private double speedMin = 0.00005;
 
     public FakeWalk(ClassLoader classLoader, GetCheckPoint getCheckPoint, GetMyRuningActivity getMyRuningActivity) {
         this.classLoader = classLoader;
@@ -100,6 +103,8 @@ public class FakeWalk extends Module {
 
                 // move to target
                 if (!waitingRelayPoints && goTo() != null) {
+                    speed = RandomUtils.nextDouble(speedMin, speedMax);
+
                     SimpleVector stepVector = CommonUtils.vector(new SimpleLocation(longitude, latitude), goTo(), speed);
                     latitude += stepVector.getLatitude();
                     longitude += stepVector.getLongitude();
@@ -116,14 +121,14 @@ public class FakeWalk extends Module {
                 aMapLocation.setLatitude(latitude);
                 aMapLocation.setLongitude(longitude);
 
-                LogUtils.i("move to " + aMapLocation);
+                LogUtils.i("move to " + aMapLocation + " with speed: " + speed);
             }
         });
 
         new RuningServiceWrapper().hookGetBupin(classLoader, new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                step += 3;
+                step += RandomUtils.nextInt(2, 4);
                 return step;
             }
         });
