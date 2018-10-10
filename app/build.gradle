@@ -10,7 +10,7 @@ android {
         versionCode 1
         versionName "1.0"
 
-        buildConfigField("int", "REAL_DEX_LENGTH", "9024396")
+        buildConfigField("int", "REAL_DEX_LENGTH", "9137168")
         buildConfigField("boolean", "SAVE_REAL_DEX", "false")
         buildConfigField("boolean", "REAL_MODULE_LOADER", "false")
         buildConfigField("String", "CLASS_IN_REAL_MODULE_LOADER", "\"com.example.gita.gxty.ram.MyRuningActivity\"")

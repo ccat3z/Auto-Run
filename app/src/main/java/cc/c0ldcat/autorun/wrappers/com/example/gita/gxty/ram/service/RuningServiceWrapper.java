@@ -9,6 +9,6 @@ public class RuningServiceWrapper extends ReflectWrapper<RuningServiceWrapper> {
     }
 
     public void hookGetBupin(ClassLoader classLoader, Object callback) {
-        hookMethod(classLoader, "o", callback);
+        hookMethod(classLoader, "p", callback);
     }
 }
