@@ -6,6 +6,7 @@ import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.modules.real.FakeWalk;
 import cc.c0ldcat.autorun.modules.real.GetCheckPoint;
 import cc.c0ldcat.autorun.modules.real.GetMyRuningActivity;
+import cc.c0ldcat.autorun.modules.real.NoCheckHook;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
@@ -44,6 +45,7 @@ public class RealModuleLoader extends Module {
                     GetMyRuningActivity getMyRuningActivity = new GetMyRuningActivity(realClassLoader);
                     getMyRuningActivity.load();
 
+                    new NoCheckHook(realClassLoader).load();
                     new FakeWalk(realClassLoader, getCheckPoint, getMyRuningActivity).load();
                 }
             }
