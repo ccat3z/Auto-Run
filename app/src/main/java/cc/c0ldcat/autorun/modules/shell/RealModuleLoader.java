@@ -32,14 +32,7 @@ public class RealModuleLoader extends Module {
                 if (cls == null)
                     return;
 
-                boolean isTargetDex = false;
-                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-                    Object dex = ReflectHelper.getPrivateMethod(Class.forName("java.lang.Class"), "getDex").invoke(cls);
-                    byte[] dexBytes = (byte[]) ReflectHelper.getPrivateMethod(Class.forName("com.android.dex.Dex"), "getBytes").invoke(dex);
-                    isTargetDex = dexBytes.length == BuildConfig.REAL_DEX_LENGTH;
-                } else {
-                    isTargetDex = XposedHelpers.findClassIfExists(BuildConfig.CLASS_IN_REAL_MODULE_LOADER, (ClassLoader) param.thisObject) != null;
-                }
+                boolean isTargetDex = XposedHelpers.findClassIfExists(BuildConfig.CLASS_IN_REAL_MODULE_LOADER, (ClassLoader) param.thisObject) != null;
 
                 if (isTargetDex) {
                     realClassLoader = (ClassLoader) param.thisObject;
