@@ -20,10 +20,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class WalkingPlan extends Module {
     private Queue<Location> wakingSteps = new LinkedList<>();
@@ -32,6 +29,7 @@ public class WalkingPlan extends Module {
     private PolylineWrapper polyline;
     private ClassLoader classLoader;
     private GetRunningMap getRunningMap;
+    private Location currentLocation;
 
     public WalkingPlan(
             ClassLoader classLoader,
@@ -40,6 +38,7 @@ public class WalkingPlan extends Module {
     ) {
         this.classLoader = classLoader;
         this.getRunningMap = getRunningMap;
+        this.currentLocation = currentLocation;
 
         checkPointPlan.addOnCheckPointPlanChangeListener(new CheckPointPlan.OnCheckPointPlanChangeListener() {
             @Override
@@ -134,8 +133,13 @@ public class WalkingPlan extends Module {
     }
 
     public Location next() {
-        Location l = wakingSteps.remove();
-        drawPolyline();
-        return l;
+        Location next = wakingSteps.element();
+        if (CommonUtils.near(currentLocation, next)) {
+            wakingSteps.remove();
+            drawPolyline();
+            return next();
+        } else {
+            return next;
+        }
     }
 }

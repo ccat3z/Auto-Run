@@ -33,6 +33,10 @@ public class CommonUtils {
         return baos.toString();
     }
 
+    public static boolean near(Location a, Location b) {
+        return distance(a, b) < 0.0001;
+    }
+
     public static double distance(double fromLongitude, double fromLatitude, double toLongitude, double toLatitude) {
         return Math.sqrt(Math.pow(fromLongitude - toLongitude, 2) + Math.pow(fromLatitude - toLatitude, 2));
     }

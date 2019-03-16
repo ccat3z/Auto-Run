@@ -60,7 +60,7 @@ public class RealModuleLoader extends Module {
                     });
 
                     new NoCheckHook(realClassLoader).load();
-                    new FakeWalk(realClassLoader, wakingPlan, fakeLocation).load();
+                    new FakeWalk(realClassLoader, wakingPlan, fakeLocation, checkPointPlan, getRunningMap).load();
                 }
             }
         });

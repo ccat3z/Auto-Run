@@ -1,8 +1,8 @@
 package cc.c0ldcat.autorun.modules.real;
 
-import android.database.CursorJoiner;
 import cc.c0ldcat.autorun.models.Location;
 import cc.c0ldcat.autorun.modules.Module;
+import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.AMapWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
@@ -82,6 +82,16 @@ public class CheckPointPlan extends Module implements
         } else {
             return false;
         }
+    }
+
+    public boolean destroyRecentCheckPoint(Location location) {
+        for (MarkerWrapper marker: checkPointMarkers) {
+            if (CommonUtils.near(marker.getOptions().getPosition(), location)) {
+                LogUtils.d("destroy check point " + marker.getOptions().getPosition());
+                return destroyCheckPoint(marker);
+            }
+        }
+        return false;
     }
 
     private void notifyCheckPointPlanChange() {

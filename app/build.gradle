@@ -8,7 +8,7 @@ android {
         minSdkVersion 23
         targetSdkVersion 25
         versionCode 3
-        versionName "1.2.0"
+        versionName "1.2.1"
 
         buildConfigField("boolean", "SAVE_REAL_DEX", "false")
         buildConfigField("boolean", "REAL_MODULE_LOADER", "false")
