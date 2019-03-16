@@ -1,14 +1,9 @@
 package cc.c0ldcat.autorun.modules.shell;
 
-import android.os.Build;
 import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.modules.Module;
-import cc.c0ldcat.autorun.modules.real.FakeWalk;
-import cc.c0ldcat.autorun.modules.real.GetCheckPoint;
-import cc.c0ldcat.autorun.modules.real.GetMyRuningActivity;
-import cc.c0ldcat.autorun.modules.real.NoCheckHook;
+import cc.c0ldcat.autorun.modules.real.*;
 import cc.c0ldcat.autorun.utils.LogUtils;
-import cc.c0ldcat.autorun.utils.ReflectHelper;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XposedHelpers;
 
@@ -45,8 +40,27 @@ public class RealModuleLoader extends Module {
                     GetMyRuningActivity getMyRuningActivity = new GetMyRuningActivity(realClassLoader);
                     getMyRuningActivity.load();
 
+                    GetRunningMap getRunningMap = new GetRunningMap(realClassLoader);
+                    getRunningMap.load();
+
+                    CheckPointPlan checkPointPlan = new CheckPointPlan(realClassLoader, getRunningMap, getCheckPoint);
+                    checkPointPlan.load();
+
+                    FakeLocation fakeLocation = new FakeLocation(realClassLoader);
+                    fakeLocation.load();
+
+                    WalkingPlan wakingPlan = new WalkingPlan(realClassLoader, getMyRuningActivity, checkPointPlan, fakeLocation, getRunningMap);
+                    wakingPlan.load();
+
+                    wakingPlan.addOnWalkingPlanChangeListener(new WalkingPlan.OnWalkingPlanChangeListener() {
+                        @Override
+                        public void onWalkingPlanChange() {
+                            LogUtils.d("new walking plan");
+                        }
+                    });
+
                     new NoCheckHook(realClassLoader).load();
-                    new FakeWalk(realClassLoader, getCheckPoint, getMyRuningActivity).load();
+                    new FakeWalk(realClassLoader, wakingPlan, fakeLocation).load();
                 }
             }
         });

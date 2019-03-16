@@ -7,4 +7,12 @@ public class MyRuningActivityWrapper extends ReflectWrapper<MyRuningActivityWrap
     public String getClassName() {
         return "com.example.gita.gxty.ram.MyRuningActivity";
     }
+
+    public void hookStart(ClassLoader classLoader, Object callback) {
+        hookMethod(classLoader, "v", callback);
+    }
+
+    public void hookPause(ClassLoader classLoader, Object callback) {
+        hookMethod(classLoader, "u", callback);
+    }
 }

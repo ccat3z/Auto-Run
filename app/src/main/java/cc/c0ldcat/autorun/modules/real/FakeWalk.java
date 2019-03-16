@@ -1,6 +1,8 @@
 package cc.c0ldcat.autorun.modules.real;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.util.Log;
 import cc.c0ldcat.autorun.BuildConfig;
 import cc.c0ldcat.autorun.Common;
 import cc.c0ldcat.autorun.models.Location;
@@ -10,6 +12,7 @@ import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
 import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.location.AMapLocationWrapper;
+import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.MyRuningActivityWrapper;
 import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.service.BaseService.AMapLocationListenerWrapper;
 import cc.c0ldcat.autorun.wrappers.com.example.gita.gxty.ram.service.RuningServiceWrapper;
 import com.android.volley.Request;
@@ -25,152 +28,117 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Deque;
-import java.util.LinkedList;
+import java.util.*;
 
 // TODO: blindly walk if distance is not enough
 
 public class FakeWalk extends Module {
     private ClassLoader classLoader;
-    private GetCheckPoint getCheckPoint;
-    private GetMyRuningActivity getMyRuningActivity;
-
-    private Object amap;
-
-    private double latitude = 0;
-    private double longitude = 0;
-
-    private boolean waitingRelayPoints = true;
-    private Deque<Location> goTos = new LinkedList<>();
+    private WalkingPlan walkingPlan;
+    private FakeLocation fakeLocation;
 
     private int step = 0;
     private double speed = 0.0001;
-    private double speedMax = 0.00015;
-    private double speedMin = 0.00005;
+    private double speedMax = 0.00007;
+    private double speedMin = 0.00002;
+    private Location next;
+    private Timer taskTimer;
 
-    public FakeWalk(ClassLoader classLoader, GetCheckPoint getCheckPoint, GetMyRuningActivity getMyRuningActivity) {
-        this.classLoader = classLoader;
-        this.getCheckPoint = getCheckPoint;
-        this.getMyRuningActivity = getMyRuningActivity;
+    class FakeWalkTask extends TimerTask {
+        private WalkingPlan walkingPlan;
+        private FakeLocation fakeLocation;
+
+        public FakeWalkTask(WalkingPlan walkingPlan, FakeLocation fakeLocation) {
+            super();
+            this.walkingPlan = walkingPlan;
+            this.fakeLocation = fakeLocation;
+        }
+
+        @Override
+        public void run() {
+            try {
+                if (next == null) next = walkingPlan.next();
+
+                speed = RandomUtils.nextDouble(speedMin, speedMax);
+                fakeLocation.move(CommonUtils.vector(fakeLocation, next, speed));
+
+                if (CommonUtils.distance(fakeLocation, next) < speed) {
+                    next = null;
+                }
+                step += RandomUtils.nextInt(1, 2);
+            } catch (NoSuchElementException e) {
+            }
+        }
     }
 
-    private Location goTo() {
-        return goTos.peekFirst();
+    public FakeWalk(ClassLoader classLoader, final WalkingPlan walkingPlan, final FakeLocation fakeLocation) {
+        this.classLoader = classLoader;
+        this.walkingPlan = walkingPlan;
+        this.fakeLocation = fakeLocation;
+    }
+
+    public void start() {
+        if (taskTimer == null) {
+            LogUtils.it("Fake walk start");
+            taskTimer = new Timer();
+            taskTimer.schedule(new FakeWalkTask(walkingPlan, fakeLocation), 1000, 1000);
+        }
+    }
+
+    public void stop() {
+        if (taskTimer != null) {
+            LogUtils.it("Fake walk stop");
+            taskTimer.cancel();
+            taskTimer = null;
+        }
     }
 
     @Override
     public void load() {
         super.load();
-        new AMapLocationListenerWrapper().hookOnLocationChanged(classLoader, new XC_MethodHook() {
-            @Override
-            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
-                super.beforeHookedMethod(param);
-
-                AMapLocationWrapper aMapLocation = new AMapLocationWrapper();
-                aMapLocation.setObject(param.args[0]);
-
-                // if change map
-                if (getCheckPoint.getAMap() != amap) {
-                    LogUtils.i("new walk plan");
-                    step = 0;
-                    amap = getCheckPoint.getAMap();
-                    goTos.clear();
-                    latitude = longitude = 0;
-                }
-
-                // init location if no fake location
-                if (latitude == 0 || longitude == 0) {
-                    LogUtils.i("init location");
-                    latitude = aMapLocation.getLatitude();
-                    longitude = aMapLocation.getLongitude();
-                }
-
-                // get next target
-                if (goTo() == null) {
-                    Location next = getCheckPoint.getNextCheckPoint(new SimpleLocation(longitude, latitude));
-
-                    if (next == null) {
-                        LogUtils.i("no more target");
-                    } else {
-                        goTos.addLast(next);
-                        LogUtils.it("waiting relay points...");
-                        waitingRelayPoints = true;
-                        addRelayPoints();
-
-                        LogUtils.i("new target " + goTo());
-                    }
-                }
-
-                // move to target
-                if (!waitingRelayPoints && goTo() != null) {
-                    speed = RandomUtils.nextDouble(speedMin, speedMax);
-
-                    SimpleVector stepVector = CommonUtils.vector(new SimpleLocation(longitude, latitude), goTo(), speed);
-                    latitude += stepVector.getLatitude();
-                    longitude += stepVector.getLongitude();
-
-                    if (Math.abs(latitude - goTo().getLatitude()) < speed
-                            && Math.abs(longitude - goTo().getLongitude()) < speed) {
-                        LogUtils.it("reach target " + goTo());
-                        goTos.pollFirst();
-                        LogUtils.it("goto target " + goTo());
-                    }
-                }
-
-                // do move
-                aMapLocation.setLatitude(latitude);
-                aMapLocation.setLongitude(longitude);
-
-                LogUtils.i("move to " + aMapLocation + " with speed: " + speed);
-            }
-        });
 
         new RuningServiceWrapper().hookGetBupin(classLoader, new XC_MethodReplacement() {
             @Override
             protected Object replaceHookedMethod(MethodHookParam methodHookParam) throws Throwable {
-                step += RandomUtils.nextInt(2, 4);
                 return step;
             }
         });
-    }
 
-    private void addRelayPoints() {
-        Context context = getMyRuningActivity.getMyRuningActivity();
-        RequestQueue queue = Volley.newRequestQueue(context);
-        String url ="http://restapi.amap.com/v3/direction/walking?origin=" + longitude + "," + latitude + "&destination=" + goTo() + "&key=" + BuildConfig.AMAP_WEB_KEY;
-
-        LogUtils.d("request " + url);
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+        MyRuningActivityWrapper myRuningActivityHelper = new MyRuningActivityWrapper();
+        myRuningActivityHelper.hookMethod(classLoader, "onCreate", Arrays.asList(new Class[]{Bundle.class}), new XC_MethodHook() {
             @Override
-            public void onResponse(JSONObject jsonObject) {
-                try {
-                    JSONArray paths = jsonObject.getJSONObject("route").getJSONArray("paths");
-                    JSONObject path = paths.getJSONObject(0);
-                    JSONArray steps = path.getJSONArray("steps");
-                    for (int i = steps.length() - 1; i >= 0 ; i--) {
-                        String[] locationStrs = steps.getJSONObject(i).getString("polyline").split(";");
-                        for (int j = locationStrs.length - 1; j >= 0; j--) {
-                            String latLngStrs[] = locationStrs[j].split(",");
-                            goTos.addFirst(new SimpleLocation(Double.parseDouble(latLngStrs[0]), Double.parseDouble(latLngStrs[1])));
-                        }
-                    }
-
-                    LogUtils.it("get relay points");
-                    LogUtils.it("goto target " + goTo());
-                    waitingRelayPoints = false;
-                } catch (JSONException e) {
-                    LogUtils.e(e);
-                    LogUtils.e(jsonObject.toString());
-                }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError volleyError) {
-                LogUtils.e("Failed + " + volleyError.networkResponse.statusCode);
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                start();
             }
         });
-
-        // Add the request to the RequestQueue.
-        queue.add(jsonObjectRequest);
+        myRuningActivityHelper.hookMethod(classLoader, "onResume", new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                start();
+            }
+        });
+        myRuningActivityHelper.hookMethod(classLoader, "onPause", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                stop();
+            }
+        });
+        myRuningActivityHelper.hookStart(classLoader, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                start();
+            }
+        });
+        myRuningActivityHelper.hookPause(classLoader, new XC_MethodHook() {
+            @Override
+            protected void afterHookedMethod(MethodHookParam param) throws Throwable {
+                super.afterHookedMethod(param);
+                stop();
+            }
+        });
     }
 }

@@ -41,9 +41,19 @@ public class CommonUtils {
         return distance(from.getLongitude(), from.getLatitude(), to.getLongitude(), to.getLatitude());
     }
 
-    // TODO: don't exceed to location
     public static SimpleVector vector(Location from, Location to, double length) {
         double time = length / distance(from, to);
+        if (time > 1.0) time = 1;
         return new SimpleVector(time * (to.getLongitude() - from.getLongitude()), time * (to.getLatitude() - from.getLatitude()));
+    }
+
+    public static Location findNearestLocation(Location from, List<Location> targets) {
+        Location min = null;
+        for (Location latLng : targets) {
+            if (min == null || (CommonUtils.distance(from, latLng) < CommonUtils.distance(from, min))) {
+                min = latLng;
+            }
+        }
+        return min;
     }
 }

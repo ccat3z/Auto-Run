@@ -15,8 +15,9 @@ public abstract class ReflectWrapper<T extends ReflectWrapper> {
 
     abstract public String getClassName();
 
-    public void setObject(Object object) {
+    public T setObject(Object object) {
         this.object = object;
+        return (T) this;
     }
 
     public Object getAttribute(String name) throws NoSuchFieldException, IllegalAccessException {
@@ -102,8 +103,17 @@ public abstract class ReflectWrapper<T extends ReflectWrapper> {
         return paramsClassList.toArray(new Class[paramsClassList.size()]);
     }
 
-    protected T newInstance(ClassLoader classLoader, Object ...params) {
+    public T newInstance(ClassLoader classLoader, Object ...params) {
         setObject(XposedHelpers.newInstance(getObjectClass(classLoader), params));
         return (T) this;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ReflectWrapper) {
+            return getObject().equals(((ReflectWrapper) obj).getObject());
+        } else {
+            return false;
+        }
     }
 }

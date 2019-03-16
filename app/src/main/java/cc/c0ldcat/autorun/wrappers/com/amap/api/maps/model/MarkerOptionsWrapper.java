@@ -12,8 +12,22 @@ public class MarkerOptionsWrapper extends ReflectWrapper<MarkerOptionsWrapper> {
         return (String) invokeMethodIfAccessable("getTitle");
     }
 
+    public MarkerOptionsWrapper newInstance(ClassLoader classLoader) {
+        return super.newInstance(classLoader);
+    }
+
     public MarkerOptionsWrapper newInstance(ClassLoader classLoader, LatLngWrapper latLngWrapper) {
         setObject(super.newInstance(classLoader).invokeMethodIfAccessable("position", latLngWrapper.getObject()));
+        return this;
+    }
+
+    public MarkerOptionsWrapper title(String title) {
+        invokeMethodIfAccessable("title", title);
+        return this;
+    }
+
+    public MarkerOptionsWrapper position(LatLngWrapper latLng) {
+        invokeMethodIfAccessable("position", latLng.getObject());
         return this;
     }
 

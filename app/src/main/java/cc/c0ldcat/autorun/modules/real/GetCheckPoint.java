@@ -1,6 +1,5 @@
 package cc.c0ldcat.autorun.modules.real;
 
-import android.util.Log;
 import cc.c0ldcat.autorun.models.Location;
 import cc.c0ldcat.autorun.modules.Module;
 import cc.c0ldcat.autorun.utils.CommonUtils;
@@ -8,28 +7,28 @@ import cc.c0ldcat.autorun.utils.LogUtils;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.AMapWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.LatLngWrapper;
 import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.MarkerOptionsWrapper;
+import cc.c0ldcat.autorun.wrappers.com.amap.api.maps.model.MarkerWrapper;
 import de.robv.android.xposed.XC_MethodHook;
 
 import java.util.*;
 
-public class GetCheckPoint extends Module implements AMapWrapper.OnMapClickListener {
+public class GetCheckPoint extends Module {
     private ClassLoader classLoader;
     private AMapWrapper aMapWrapper = new AMapWrapper();
     private List<Location> latLngs = new ArrayList<>();
-    private AMapWrapper.OnMapClickListener onMapClickListener = this;
+
+    private ArrayList<OnNewCheckPointListener> onNewCheckPointListeners = new ArrayList<>();
 
     public GetCheckPoint(ClassLoader classLoader) {
         this.classLoader = classLoader;
     }
 
+    @Deprecated
     public Object getAMap() {
         return aMapWrapper.getObject();
     }
 
-    public AMapWrapper getaMapWrapper() {
-        return aMapWrapper;
-    }
-
+    @Deprecated
     public Location getNextCheckPoint(Location location) throws NoSuchElementException {
         Location min = null;
         for (Location latLng : latLngs) {
@@ -57,27 +56,28 @@ public class GetCheckPoint extends Module implements AMapWrapper.OnMapClickListe
 
                 // if change map
                 if(aMapWrapper.getObject() != param.thisObject) {
-                    LogUtils.i("new run plan");
                     latLngs.clear();
                     aMapWrapper.setObject(param.thisObject);
-                    aMapWrapper.setOnMapClickListener(onMapClickListener);
                 }
 
                 if (title != null && (title.equals("必经点") || title.equals("途经点"))) {
                     LatLngWrapper latLng = markerOption.getPosition();
-
                     latLngs.add(latLng);
-
                     LogUtils.i(title + ": " + latLng);
+
+                    for (OnNewCheckPointListener listener: onNewCheckPointListeners) {
+                        listener.onNewCheckPoint(latLng);
+                    }
                 }
             }
         });
     }
 
-    @Override
-    public void onMapClick(LatLngWrapper point) {
-        latLngs.add(point);
-        aMapWrapper.addMarker(point);
-        LogUtils.it("new checkpoint " + point);
+    interface OnNewCheckPointListener {
+        void onNewCheckPoint (LatLngWrapper latLng);
+    }
+
+    void addOnNewCheckPointListener (OnNewCheckPointListener listener) {
+        onNewCheckPointListeners.add(listener);
     }
 }
