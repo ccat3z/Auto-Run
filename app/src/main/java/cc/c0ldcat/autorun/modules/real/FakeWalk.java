@@ -23,7 +23,7 @@ public class FakeWalk extends Module {
 
     private int step = 0;
     private double speedMax = 0.00007;
-    private double speedMin = 0.00002;
+    private double speedMin = 0.000005;
     private Timer taskTimer;
 
     class FakeWalkTask extends TimerTask {
@@ -42,7 +42,7 @@ public class FakeWalk extends Module {
         public void run() {
             try {
                 fakeLocation.move(CommonUtils.vector(fakeLocation, walkingPlan.next(), RandomUtils.nextDouble(speedMin, speedMax)));
-                step += RandomUtils.nextInt(1, 2);
+                step += RandomUtils.nextInt(1, 3);
                 checkPointPlan.destroyRecentCheckPoint(fakeLocation);
             } catch (NoSuchElementException e) {
             }
